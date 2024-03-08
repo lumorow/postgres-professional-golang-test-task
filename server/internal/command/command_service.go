@@ -50,11 +50,16 @@ func (s *service) CreateCommand(c context.Context, req *CreateCommandReq) (*Crea
 	return res, nil
 }
 
-func (s *service) GetCommandById(c context.Context, id int64) (*Command, error) {
+func (s *service) GetCommandById(c context.Context, id string) (*Command, error) {
+	i, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
 	ctx, cancel := context.WithTimeout(c, s.timeout)
 	defer cancel()
 
-	r, err := s.Repository.GetCommandById(ctx, id)
+	r, err := s.Repository.GetCommandById(ctx, i)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +71,7 @@ func (s *service) GetCommands(c context.Context) (*[]Command, error) {
 	ctx, cancel := context.WithTimeout(c, s.timeout)
 	defer cancel()
 
-	r, err := s.Repository.GetAllCommands(ctx)
+	r, err := s.Repository.GetCommands(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -31,6 +31,6 @@ type Repository interface {
 
 type Service interface {
 	CreateCommand(c context.Context, req *CreateCommandReq) (*CreateCommandRes, error)
-	GetCommandById(c context.Context, id int64) (*Command, error)
+	GetCommandById(c context.Context, id string) (*Command, error)
 	GetCommands(c context.Context) (*[]Command, error)
 }
