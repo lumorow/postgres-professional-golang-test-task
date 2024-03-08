@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"log"
 	"pstgrprof/server/db"
@@ -32,10 +31,8 @@ func main() {
 	commandSvc := command.NewService(commandRep)
 	CommandHandler := command.NewHandler(commandSvc)
 
-	var r gin.Engine
-
-	router.InitRouter(&r, CommandHandler)
-	if err = router.Start(&r, fmt.Sprintf("%s:%s", viper.GetString("server.host"), viper.GetString("server.port"))); err != nil {
+	r := router.InitRouter(CommandHandler)
+	if err = router.Start(r, fmt.Sprintf("%s:%s", viper.GetString("server.host"), viper.GetString("server.port"))); err != nil {
 		log.Fatalf("could not start server: %s", err.Error())
 	}
 }

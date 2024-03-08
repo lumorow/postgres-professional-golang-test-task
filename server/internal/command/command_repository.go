@@ -22,7 +22,7 @@ func NewRepository(db DBTX) Repository {
 
 func (r *repository) CreateCommand(ctx context.Context, command *Command) (*Command, error) {
 	var lastInsertId int64
-	query := "INSERT INTO commands(command, decription) VALUES ($1,$2) RETURNING id"
+	query := "INSERT INTO commands(command, description) VALUES ($1,$2) RETURNING id"
 	err := r.db.QueryRowContext(ctx, query, command.CommandBody, command.Description).Scan(&lastInsertId)
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (r *repository) GetAllCommands(ctx context.Context) (*[]Command, error) {
 
 	for rows.Next() {
 		c := Command{}
-		err = rows.Scan(&c)
+		err = rows.Scan(&c.ID, &c.CommandBody, &c.Description)
 		if err != nil {
 			return nil, err
 		}

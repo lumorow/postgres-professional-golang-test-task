@@ -5,13 +5,14 @@ import (
 	"pstgrprof/server/internal/command"
 )
 
-func InitRouter(r *gin.Engine, commandHandler *command.Handler) {
-	r = gin.Default()
+func InitRouter(commandHandler *command.Handler) *gin.Engine {
+	r := gin.New()
 
 	r.POST("/command", commandHandler.CreateCommand)
 	r.GET("/command/:id", commandHandler.GetCommand)
 	r.GET("/commands", commandHandler.GetAllCommands)
 
+	return r
 }
 
 func Start(r *gin.Engine, addr string) error {
