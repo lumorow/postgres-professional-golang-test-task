@@ -43,7 +43,7 @@ func (r *repository) GetCommandById(ctx context.Context, id int64) (*Command, er
 	return &c, nil
 }
 
-func (r *repository) GetAllCommands(ctx context.Context) (*[]Command, error) {
+func (r *repository) GetCommands(ctx context.Context) (*[]Command, error) {
 	var cs []Command
 	query := "SELECT id, command, description FROM commands"
 	rows, err := r.db.QueryContext(ctx, query)

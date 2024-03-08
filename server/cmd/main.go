@@ -1,10 +1,13 @@
 package main
 
 import (
+	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"log"
 	"pstgrprof/server/db"
 	"pstgrprof/server/internal/command"
+	"pstgrprof/server/router"
 )
 
 func main() {
@@ -26,6 +29,15 @@ func main() {
 	defer dbConn.Close()
 
 	commandRep := command.NewRepository(dbConn.GetDB())
+	commandSvc := command.NewService(commandRep)
+	CommandHandler := command.NewHandler(commandSvc)
+
+	var r *gin.Engine
+
+	router.InitRouter(r, CommandHandler)
+	if err = router.Start(r, fmt.Sprintf("%s:%s", viper.GetString("server.host"), viper.GetString("server.port"))); err != nil {
+		log.Fatalf("could not start server: %s", err.Error())
+	}
 }
 
 func initConfig() error {
