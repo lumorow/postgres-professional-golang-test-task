@@ -67,11 +67,11 @@ func (s *service) GetCommandById(c context.Context, id string) (*Command, error)
 	return r, nil
 }
 
-func (s *service) GetCommands(c context.Context) (*[]Command, error) {
+func (s *service) GetAllCommands(c context.Context) (*[]Command, error) {
 	ctx, cancel := context.WithTimeout(c, s.timeout)
 	defer cancel()
 
-	r, err := s.Repository.GetCommands(ctx)
+	r, err := s.Repository.GetAllCommands(ctx)
 	if err != nil {
 		return nil, err
 	}

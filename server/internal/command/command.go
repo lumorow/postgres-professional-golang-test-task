@@ -26,11 +26,11 @@ type CreateCommandRes struct {
 type Repository interface {
 	CreateCommand(ctx context.Context, command *Command) (*Command, error)
 	GetCommandById(ctx context.Context, id int64) (*Command, error)
-	GetCommands(ctx context.Context) (*[]Command, error)
+	GetAllCommands(ctx context.Context) (*[]Command, error)
 }
 
 type Service interface {
 	CreateCommand(c context.Context, req *CreateCommandReq) (*CreateCommandRes, error)
 	GetCommandById(c context.Context, id string) (*Command, error)
-	GetCommands(c context.Context) (*[]Command, error)
+	GetAllCommands(c context.Context) (*[]Command, error)
 }

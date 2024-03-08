@@ -32,16 +32,17 @@ func main() {
 	commandSvc := command.NewService(commandRep)
 	CommandHandler := command.NewHandler(commandSvc)
 
-	var r *gin.Engine
+	var r gin.Engine
 
-	router.InitRouter(r, CommandHandler)
-	if err = router.Start(r, fmt.Sprintf("%s:%s", viper.GetString("server.host"), viper.GetString("server.port"))); err != nil {
+	router.InitRouter(&r, CommandHandler)
+	if err = router.Start(&r, fmt.Sprintf("%s:%s", viper.GetString("server.host"), viper.GetString("server.port"))); err != nil {
 		log.Fatalf("could not start server: %s", err.Error())
 	}
 }
 
 func initConfig() error {
-	viper.AddConfigPath("configs")
+	viper.AddConfigPath("server/configs")
 	viper.SetConfigName("config")
+	viper.SetConfigType("yml")
 	return viper.ReadInConfig()
 }

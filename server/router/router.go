@@ -8,9 +8,9 @@ import (
 func InitRouter(r *gin.Engine, commandHandler *command.Handler) {
 	r = gin.Default()
 
-	r.POST("/signup", commandHandler.CreateCommand)
-	r.POST("/login", commandHandler.GetCommand)
-	r.GET("/logout", commandHandler.GetCommands)
+	r.POST("/command", commandHandler.CreateCommand)
+	r.GET("/command/:id", commandHandler.GetCommand)
+	r.GET("/commands", commandHandler.GetAllCommands)
 
 }
 
