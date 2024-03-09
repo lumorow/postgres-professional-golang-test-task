@@ -5,7 +5,9 @@ import (
 	"github.com/spf13/viper"
 	"log"
 	"pstgrprof/server/db"
-	"pstgrprof/server/internal/command"
+	"pstgrprof/server/internal/handler/command"
+	command_repo "pstgrprof/server/internal/repository/command"
+	command_service "pstgrprof/server/internal/service/command"
 	"pstgrprof/server/router"
 )
 
@@ -27,8 +29,8 @@ func main() {
 	}
 	defer dbConn.Close()
 
-	commandRep := command.NewRepository(dbConn.GetDB())
-	commandSvc := command.NewService(commandRep)
+	commandRep := command_repo.NewRepository(dbConn.GetDB())
+	commandSvc := command_service.NewService(commandRep)
 	CommandHandler := command.NewHandler(commandSvc)
 
 	r := router.InitRouter(CommandHandler)

@@ -1,5 +1,5 @@
 CREATE TABLE "commands" (
-    "id" bigserial PRIMARY KEY,
-    "command" varchar NOT NULL,
+    "id" bigint PRIMARY KEY,
+    "script" varchar NOT NULL,
     "description" varchar NOT NULL
 );

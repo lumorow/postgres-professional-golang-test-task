@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"pstgrprof/server/internal/command"
+	"pstgrprof/server/internal/handler/command"
 )
 
 func InitRouter(commandHandler *command.Handler) *gin.Engine {
@@ -11,7 +11,7 @@ func InitRouter(commandHandler *command.Handler) *gin.Engine {
 	r.POST("/command", commandHandler.CreateCommand)
 	r.GET("/command/:id", commandHandler.GetCommand)
 	r.GET("/commands", commandHandler.GetAllCommands)
-
+	r.DELETE("/command/:id", commandHandler.GetCommand)
 	return r
 }
 
