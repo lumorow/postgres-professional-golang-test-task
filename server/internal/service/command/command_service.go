@@ -2,11 +2,8 @@ package command
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"pstgrprof/server/internal/entity"
 	"strconv"
-	"time"
 )
 
 //go:generate mockgen -destination=mocks/service.go -package=mock -source=command_service.go
@@ -18,28 +15,29 @@ type Repository interface {
 	GetAllCommands(ctx context.Context) (*[]entity.Command, error)
 }
 
-type Service struct {
-	Repository
-	timeout time.Duration
+type Cache interface {
+	Set(key, value string) error
+	Delete(key string) error
+	GetAll() ([]int, error)
+	CheckKey(key int) error
 }
 
-func NewService(repository Repository) *Service {
-	return &Service{
+type Service struct {
+	Repository
+	Cache
+}
+
+func NewService(repository Repository, cache Cache) *Service {
+	s := &Service{
 		repository,
-		time.Duration(2) * time.Second,
+		cache,
 	}
+
+	go s.Runner()
+	return s
 }
 
 func (s *Service) CreateCommand(ctx context.Context, req *entity.CreateCommandReq) (*entity.CreateCommandRes, error) {
-
-	if len(req.Script) == 0 {
-		return nil, errors.New("script must not be empty")
-	}
-
-	if len(req.Description) == 0 {
-		return nil, errors.New("description for script must not be empty")
-	}
-
 	cd := &entity.Command{
 		Script:      req.Script,
 		Description: req.Description,
@@ -50,14 +48,14 @@ func (s *Service) CreateCommand(ctx context.Context, req *entity.CreateCommandRe
 		return nil, err
 	}
 
+	// Добавить к кеш значение
+	// map[id] = entity.Command{}
+
 	res := &entity.CreateCommandRes{
-		//ID:          strconv.Itoa(int(r.ID)),
-		ID:          "1",
+		ID:          strconv.Itoa(int(r.ID)),
 		Script:      r.Script,
 		Description: req.Description,
 	}
-
-	fmt.Println(res)
 
 	return res, nil
 }

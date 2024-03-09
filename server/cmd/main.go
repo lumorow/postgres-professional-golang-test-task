@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"log"
 	"pstgrprof/server/db"
 	"pstgrprof/server/internal/handler/command"
 	command_repo "pstgrprof/server/internal/repository/command"
+	"pstgrprof/server/internal/router"
 	command_service "pstgrprof/server/internal/service/command"
-	"pstgrprof/server/router"
+
+	"github.com/spf13/viper"
 )
 
 func main() {
@@ -30,7 +31,7 @@ func main() {
 	defer dbConn.Close()
 
 	commandRep := command_repo.NewRepository(dbConn.GetDB())
-	commandSvc := command_service.NewService(commandRep)
+	commandSvc := command_service.NewService(commandRep, nil)
 	CommandHandler := command.NewHandler(commandSvc)
 
 	r := router.InitRouter(CommandHandler)
