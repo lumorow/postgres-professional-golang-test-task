@@ -14,24 +14,27 @@ type Repository interface {
 	GetAllCommands(ctx context.Context) (*[]entity.Command, error)
 	GetCommands(ctx context.Context, id []int64) (*[]entity.Command, error)
 	DeleteCommandById(ctx context.Context, id int64) error
+	CreateCommandOutput(ctx context.Context, id int64, output string) error
 }
 
 type Cache interface {
-	Set(key, value string) error
-	Delete(key string) error
-	GetAll() ([]int, error)
-	CheckKey(key int) error
+	Set(key int64, value any) error
+	Get(key int64) (any, error)
+	GetAllKeys() ([]int64, error)
+	Delete(key int64) error
 }
 
 type Service struct {
 	Repository
-	Cache
+	ScriptsCache Cache
+	ExecCmdCache Cache
 }
 
-func NewService(repository Repository, cache Cache) *Service {
+func NewService(repository Repository, scriptsCache, execCmdCache Cache) *Service {
 	s := &Service{
 		repository,
-		cache,
+		scriptsCache,
+		execCmdCache,
 	}
 
 	go s.Runner()

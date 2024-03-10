@@ -12,8 +12,9 @@ import (
 
 func TestService_CreateCommand(t *testing.T) {
 	type fields struct {
-		Repository *mock.MockRepository
-		Cache      *mock.MockCache
+		Repository   *mock.MockRepository
+		ScriptsCache *mock.MockCache
+		ExecCmdCache *mock.MockCache
 	}
 	type args struct {
 		c   context.Context
@@ -56,11 +57,12 @@ func TestService_CreateCommand(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := fields{
-				Repository: mock.NewMockRepository(ctrl),
-				Cache:      mock.NewMockCache(ctrl),
+				Repository:   mock.NewMockRepository(ctrl),
+				ScriptsCache: mock.NewMockCache(ctrl),
+				ExecCmdCache: mock.NewMockCache(ctrl),
 			}
 			tt.prepare(tt.args, f)
-			service := NewService(f.Repository, f.Cache)
+			service := NewService(f.Repository, f.ScriptsCache, f.ExecCmdCache)
 			got, err := service.CreateCommand(tt.args.c, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)

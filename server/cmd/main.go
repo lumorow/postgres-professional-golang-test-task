@@ -5,6 +5,7 @@ import (
 	"log"
 	"pstgrprof/server/db"
 	"pstgrprof/server/internal/handler/command"
+	command_cache "pstgrprof/server/internal/repository/cache"
 	command_repo "pstgrprof/server/internal/repository/command"
 	"pstgrprof/server/internal/router"
 	command_service "pstgrprof/server/internal/service/command"
@@ -31,7 +32,9 @@ func main() {
 	defer dbConn.Close()
 
 	commandRep := command_repo.NewRepository(dbConn.GetDB())
-	commandSvc := command_service.NewService(commandRep, nil)
+	scriptsCache := command_cache.NewCache()
+	execCmdCache := command_cache.NewCache()
+	commandSvc := command_service.NewService(commandRep, scriptsCache, execCmdCache)
 	CommandHandler := command.NewHandler(commandSvc)
 
 	r := router.InitRouter(CommandHandler)

@@ -21,6 +21,12 @@ func (s *Service) GetCommands(ctx context.Context, ids []string) (*[]entity.Comm
 	if err != nil {
 		return nil, err
 	}
+	for _, scr := range *r {
+		err = s.ScriptsCache.Set(scr.ID, scr.Script)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return r, nil
 }

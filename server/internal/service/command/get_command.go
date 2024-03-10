@@ -17,5 +17,10 @@ func (s *Service) GetCommandById(ctx context.Context, id string) (*entity.Comman
 		return nil, err
 	}
 
+	err = s.ScriptsCache.Set(r.ID, r.Script)
+	if err != nil {
+		return nil, err
+	}
+
 	return r, nil
 }

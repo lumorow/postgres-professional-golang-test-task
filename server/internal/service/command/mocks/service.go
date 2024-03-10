@@ -50,6 +50,20 @@ func (mr *MockRepositoryMockRecorder) CreateCommand(ctx, command interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCommand", reflect.TypeOf((*MockRepository)(nil).CreateCommand), ctx, command)
 }
 
+// CreateCommandOutput mocks base method.
+func (m *MockRepository) CreateCommandOutput(ctx context.Context, id int64, output string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateCommandOutput", ctx, id, output)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateCommandOutput indicates an expected call of CreateCommandOutput.
+func (mr *MockRepositoryMockRecorder) CreateCommandOutput(ctx, id, output interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCommandOutput", reflect.TypeOf((*MockRepository)(nil).CreateCommandOutput), ctx, id, output)
+}
+
 // DeleteCommandById mocks base method.
 func (m *MockRepository) DeleteCommandById(ctx context.Context, id int64) error {
 	m.ctrl.T.Helper()
@@ -132,22 +146,8 @@ func (m *MockCache) EXPECT() *MockCacheMockRecorder {
 	return m.recorder
 }
 
-// CheckKey mocks base method.
-func (m *MockCache) CheckKey(key int) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CheckKey", key)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CheckKey indicates an expected call of CheckKey.
-func (mr *MockCacheMockRecorder) CheckKey(key interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckKey", reflect.TypeOf((*MockCache)(nil).CheckKey), key)
-}
-
 // Delete mocks base method.
-func (m *MockCache) Delete(key string) error {
+func (m *MockCache) Delete(key int64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", key)
 	ret0, _ := ret[0].(error)
@@ -160,23 +160,38 @@ func (mr *MockCacheMockRecorder) Delete(key interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockCache)(nil).Delete), key)
 }
 
-// GetAll mocks base method.
-func (m *MockCache) GetAll() ([]int, error) {
+// Get mocks base method.
+func (m *MockCache) Get(key int64) (any, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAll")
-	ret0, _ := ret[0].([]int)
+	ret := m.ctrl.Call(m, "Get", key)
+	ret0, _ := ret[0].(any)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetAll indicates an expected call of GetAll.
-func (mr *MockCacheMockRecorder) GetAll() *gomock.Call {
+// Get indicates an expected call of Get.
+func (mr *MockCacheMockRecorder) Get(key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockCache)(nil).GetAll))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockCache)(nil).Get), key)
+}
+
+// GetAllKeys mocks base method.
+func (m *MockCache) GetAllKeys() ([]int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllKeys")
+	ret0, _ := ret[0].([]int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllKeys indicates an expected call of GetAllKeys.
+func (mr *MockCacheMockRecorder) GetAllKeys() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllKeys", reflect.TypeOf((*MockCache)(nil).GetAllKeys))
 }
 
 // Set mocks base method.
-func (m *MockCache) Set(key, value string) error {
+func (m *MockCache) Set(key int64, value any) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Set", key, value)
 	ret0, _ := ret[0].(error)

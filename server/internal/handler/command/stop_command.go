@@ -8,7 +8,7 @@ import (
 func (h *Handler) StopCommandById(c *gin.Context) {
 	id := c.Param("id")
 
-	err := h.Service.StopCommandById(c.Request.Context(), id)
+	err := h.Service.StopCommandById(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
