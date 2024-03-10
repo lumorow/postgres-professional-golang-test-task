@@ -12,6 +12,9 @@ func (r *Repository) GetCommandById(ctx context.Context, id int64) (*entity.Comm
 	if err != nil {
 		return nil, err
 	}
+	
+	// Добавить к кеш значение
+	// map[id] = entity.Command{}
 
 	return &c, nil
 }

@@ -12,6 +12,7 @@ type Service interface {
 	CreateCommand(c context.Context, req *entity.CreateCommandReq) (*entity.CreateCommandRes, error)
 	GetCommandById(c context.Context, id string) (*entity.Command, error)
 	GetAllCommands(c context.Context) (*[]entity.Command, error)
+	GetCommands(ctx context.Context, ids []string) (*[]entity.Command, error)
 }
 
 type Handler struct {

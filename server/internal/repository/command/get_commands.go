@@ -2,13 +2,20 @@ package command
 
 import (
 	"context"
+	"database/sql"
+	"github.com/jmoiron/sqlx"
 	"pstgrprof/server/internal/entity"
 )
 
-func (r *Repository) GetAllCommands(ctx context.Context) (*[]entity.Command, error) {
+func (r *Repository) GetCommands(ctx context.Context, ids []int64) (*[]entity.Command, error) {
 	var cs []entity.Command
-	query := "SELECT id, script, description FROM commands"
-	rows, err := r.db.QueryContext(ctx, query)
+	query, args, err := sqlx.In("SELECT id, script, description FROM commands WHERE id IN(?)", ids)
+	if err != nil {
+		return nil, err
+	}
+
+	query = sqlx.Rebind(sqlx.DOLLAR, query)
+	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -20,6 +27,10 @@ func (r *Repository) GetAllCommands(ctx context.Context) (*[]entity.Command, err
 			return nil, err
 		}
 		cs = append(cs, c)
+	}
+
+	if len(cs) == 0 {
+		return nil, sql.ErrNoRows
 	}
 	return &cs, nil
 }

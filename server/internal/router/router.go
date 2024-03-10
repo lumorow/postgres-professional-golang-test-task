@@ -10,7 +10,8 @@ func InitRouter(commandHandler *command.Handler) *gin.Engine {
 
 	r.POST("/command", commandHandler.CreateCommand)
 	r.GET("/command/:id", commandHandler.GetCommand)
-	r.GET("/commands", commandHandler.GetAllCommands)
+	r.GET("/commands", commandHandler.GetCommands)
+	r.GET("/all-commands", commandHandler.GetAllCommands)
 	r.DELETE("/command/:id", commandHandler.GetCommand)
 	return r
 }

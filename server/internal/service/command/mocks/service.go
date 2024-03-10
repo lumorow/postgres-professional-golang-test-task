@@ -80,6 +80,21 @@ func (mr *MockRepositoryMockRecorder) GetCommandById(ctx, id interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCommandById", reflect.TypeOf((*MockRepository)(nil).GetCommandById), ctx, id)
 }
 
+// GetCommands mocks base method.
+func (m *MockRepository) GetCommands(ctx context.Context, id []int64) (*[]entity.Command, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCommands", ctx, id)
+	ret0, _ := ret[0].(*[]entity.Command)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCommands indicates an expected call of GetCommands.
+func (mr *MockRepositoryMockRecorder) GetCommands(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCommands", reflect.TypeOf((*MockRepository)(nil).GetCommands), ctx, id)
+}
+
 // MockCache is a mock of Cache interface.
 type MockCache struct {
 	ctrl     *gomock.Controller
@@ -103,6 +118,20 @@ func (m *MockCache) EXPECT() *MockCacheMockRecorder {
 	return m.recorder
 }
 
+// CheckKey mocks base method.
+func (m *MockCache) CheckKey(key int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckKey", key)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CheckKey indicates an expected call of CheckKey.
+func (mr *MockCacheMockRecorder) CheckKey(key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckKey", reflect.TypeOf((*MockCache)(nil).CheckKey), key)
+}
+
 // Delete mocks base method.
 func (m *MockCache) Delete(key string) error {
 	m.ctrl.T.Helper()
@@ -117,19 +146,19 @@ func (mr *MockCacheMockRecorder) Delete(key interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockCache)(nil).Delete), key)
 }
 
-// Get mocks base method.
-func (m *MockCache) Get(key string) (string, error) {
+// GetAll mocks base method.
+func (m *MockCache) GetAll() ([]int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Get", key)
-	ret0, _ := ret[0].(string)
+	ret := m.ctrl.Call(m, "GetAll")
+	ret0, _ := ret[0].([]int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Get indicates an expected call of Get.
-func (mr *MockCacheMockRecorder) Get(key interface{}) *gomock.Call {
+// GetAll indicates an expected call of GetAll.
+func (mr *MockCacheMockRecorder) GetAll() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockCache)(nil).Get), key)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockCache)(nil).GetAll))
 }
 
 // Set mocks base method.
