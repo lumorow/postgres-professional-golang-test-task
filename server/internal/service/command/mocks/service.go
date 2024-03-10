@@ -50,6 +50,20 @@ func (mr *MockRepositoryMockRecorder) CreateCommand(ctx, command interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCommand", reflect.TypeOf((*MockRepository)(nil).CreateCommand), ctx, command)
 }
 
+// DeleteCommandById mocks base method.
+func (m *MockRepository) DeleteCommandById(ctx context.Context, id int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCommandById", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCommandById indicates an expected call of DeleteCommandById.
+func (mr *MockRepositoryMockRecorder) DeleteCommandById(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCommandById", reflect.TypeOf((*MockRepository)(nil).DeleteCommandById), ctx, id)
+}
+
 // GetAllCommands mocks base method.
 func (m *MockRepository) GetAllCommands(ctx context.Context) (*[]entity.Command, error) {
 	m.ctrl.T.Helper()

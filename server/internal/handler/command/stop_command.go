@@ -5,12 +5,14 @@ import (
 	"net/http"
 )
 
-func (h *Handler) GetCommandById(c *gin.Context) {
+func (h *Handler) StopCommandById(c *gin.Context) {
 	id := c.Param("id")
-	res, err := h.Service.GetCommandById(c.Request.Context(), id)
+
+	err := h.Service.StopCommandById(c.Request.Context(), id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, res)
+
+	c.JSON(http.StatusOK, gin.H{"message": "command stopped successfully"})
 }

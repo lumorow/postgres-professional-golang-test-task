@@ -13,6 +13,8 @@ type Service interface {
 	GetCommandById(c context.Context, id string) (*entity.Command, error)
 	GetAllCommands(c context.Context) (*[]entity.Command, error)
 	GetCommands(ctx context.Context, ids []string) (*[]entity.Command, error)
+	DeleteCommandById(ctx context.Context, id string) error
+	StopCommandById(ctx context.Context, id string) error
 }
 
 type Handler struct {

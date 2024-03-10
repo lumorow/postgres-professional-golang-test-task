@@ -11,6 +11,8 @@ type DBTX interface {
 	QueryContext(context.Context, string, ...interface{}) (*sql.Rows, error)
 	QueryRowContext(context.Context, string, ...interface{}) *sql.Row
 	Query(query string, args ...interface{}) (*sql.Rows, error)
+	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
+	Begin() (*sql.Tx, error)
 }
 
 type Repository struct {

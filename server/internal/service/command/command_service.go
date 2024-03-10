@@ -13,6 +13,7 @@ type Repository interface {
 	GetCommandById(ctx context.Context, id int64) (*entity.Command, error)
 	GetAllCommands(ctx context.Context) (*[]entity.Command, error)
 	GetCommands(ctx context.Context, id []int64) (*[]entity.Command, error)
+	DeleteCommandById(ctx context.Context, id int64) error
 }
 
 type Cache interface {
