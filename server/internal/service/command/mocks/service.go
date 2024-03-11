@@ -109,18 +109,18 @@ func (mr *MockRepositoryMockRecorder) GetCommandById(ctx, id interface{}) *gomoc
 }
 
 // GetCommands mocks base method.
-func (m *MockRepository) GetCommands(ctx context.Context, id []int64) (*[]entity.Command, error) {
+func (m *MockRepository) GetCommands(ctx context.Context, ids []int64) (*[]entity.Command, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCommands", ctx, id)
+	ret := m.ctrl.Call(m, "GetCommands", ctx, ids)
 	ret0, _ := ret[0].(*[]entity.Command)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetCommands indicates an expected call of GetCommands.
-func (mr *MockRepositoryMockRecorder) GetCommands(ctx, id interface{}) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) GetCommands(ctx, ids interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCommands", reflect.TypeOf((*MockRepository)(nil).GetCommands), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCommands", reflect.TypeOf((*MockRepository)(nil).GetCommands), ctx, ids)
 }
 
 // MockCache is a mock of Cache interface.

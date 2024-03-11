@@ -22,7 +22,7 @@ func (s *Service) Runner() {
 	wg := sync.WaitGroup{}
 	ctx := context.Background()
 	select {
-	case <-s.StopSignal:
+	case <-s.stopSignal:
 		return
 	default:
 		for {
@@ -127,4 +127,8 @@ func (s *Service) writeCommandOutput(ctx context.Context, id int64, consoleMode 
 			log.Println(fmt.Sprintf("error writing command_id = %d output to database: %s", id, err))
 		}
 	}
+}
+
+func (s *Service) StopRunner() {
+	s.stopSignal <- struct{}{}
 }

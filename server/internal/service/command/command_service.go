@@ -12,7 +12,7 @@ type Repository interface {
 	CreateCommand(ctx context.Context, command *entity.Command) (*entity.Command, error)
 	GetCommandById(ctx context.Context, id int64) (*entity.Command, error)
 	GetAllCommands(ctx context.Context) (*[]entity.Command, error)
-	GetCommands(ctx context.Context, id []int64) (*[]entity.Command, error)
+	GetCommands(ctx context.Context, ids []int64) (*[]entity.Command, error)
 	DeleteCommandById(ctx context.Context, id int64) error
 	CreateCommandOutput(ctx context.Context, id int64, output string) error
 }
@@ -29,18 +29,18 @@ type Service struct {
 	Repository
 	ScriptsCache Cache
 	ExecCmdCache Cache
-	StopSignal   chan struct{}
+	stopSignal   chan struct{}
 }
 
 // NewService
-// StopSignal needed for kill s.Runner for testing
+// stopSignal needed for kill s.Runner
 func NewService(repository Repository, scriptsCache, execCmdCache Cache) *Service {
-	StopSignal := make(chan struct{})
+	stopSignal := make(chan struct{})
 	s := &Service{
 		repository,
 		scriptsCache,
 		execCmdCache,
-		StopSignal,
+		stopSignal,
 	}
 
 	go s.Runner()

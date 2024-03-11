@@ -2,7 +2,7 @@ PATH := $(PATH):$(shell go env GOPATH)/bin
 
 .PHONY: postgresinit
 postgresinit:
-	@echo "Create postgres database in docker"
+	@echo "Create and start postgres database in docker"
 	docker run --name postgres -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres
 
 .PHONY: dropdb
