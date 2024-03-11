@@ -10,7 +10,7 @@ func (r *Repository) DeleteCommandById(ctx context.Context, id int64) error {
 		return err
 	}
 
-	deleteOutputsCommandQuery := "DELETE FROM commands_output WHERE id = $1"
+	deleteOutputsCommandQuery := "DELETE FROM commands_output WHERE id_command = $1"
 	_, err = tx.ExecContext(ctx, deleteOutputsCommandQuery, id)
 
 	if err != nil {
