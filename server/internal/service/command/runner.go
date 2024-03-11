@@ -3,6 +3,7 @@ package command
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os/exec"
@@ -14,14 +15,16 @@ const (
 	OFF = false
 )
 
-// Runner check a new scripts for start
+// Runner Check a new scripts for start
 func (s *Service) Runner() {
 	ch := make(chan struct{}, 10)
+	defer close(ch)
 	wg := sync.WaitGroup{}
 	ctx := context.Background()
 	for {
 		scriptIds, _ := s.ScriptsCache.GetAllKeys()
 		wg.Add(len(scriptIds))
+
 		ConsoleMode := OFF
 		if len(scriptIds) == 1 {
 			ConsoleMode = ON
@@ -30,7 +33,6 @@ func (s *Service) Runner() {
 		for _, id := range scriptIds {
 			ch <- struct{}{}
 			go func(id int64) {
-				fmt.Println(len(scriptIds))
 				defer func() {
 					_ = s.ScriptsCache.Delete(id)
 					_ = s.ExecCmdCache.Delete(id)
@@ -38,45 +40,31 @@ func (s *Service) Runner() {
 					<-ch
 				}()
 
-				val, _ := s.ScriptsCache.Get(id)
-
-				script := val.(string)
-
-				_ = script
-
-				cmd := exec.Command("/bin/sh", "-c", script)
-				_ = s.ExecCmdCache.Set(id, cmd)
-
-				stdout, err := cmd.StdoutPipe()
-
+				scanner, cmd, err := s.commandStart(id)
 				if err != nil {
-					log.Println("error creating stdout pipe:", err)
+					log.Println(err)
 					return
 				}
 
-				if err := cmd.Start(); err != nil {
-					log.Println("error starting command:", err)
-					return
-				}
+				outputScriptCh := make(chan string, 5)
+				writeDoneCh := make(chan struct{})
 
-				scanner := bufio.NewScanner(stdout)
+				defer close(writeDoneCh)
 
-				outputScriptCh := make(chan string)
+				go s.readCommandOutput(scanner, outputScriptCh)
 
-				fmt.Println(ConsoleMode)
-
-				go s.ReadCommandOutput(scanner, outputScriptCh)
-
-				s.WriteCommandOutput(ctx, id, outputScriptCh, ConsoleMode)
+				go s.writeCommandOutput(ctx, id, ConsoleMode, outputScriptCh, writeDoneCh)
 
 				if err := scanner.Err(); err != nil {
-					log.Println("error scanning command output:", err)
+					log.Println(fmt.Sprintf("error: scanning command_id = %d output: %s", id, err))
 				}
 
-				if err := cmd.Wait(); err != nil {
-					log.Println("error waiting for command:", err)
+				err = cmd.Wait()
+				<-writeDoneCh
+				if err != nil {
+					log.Println(fmt.Sprintf("error: command id = %d %s", id, err))
 				} else {
-					log.Println("command executed successfully!")
+					log.Println(fmt.Sprintf("command_id = %d executed successfully!", id))
 				}
 			}(id)
 		}
@@ -84,22 +72,52 @@ func (s *Service) Runner() {
 	}
 }
 
+// commandStart Get id command and starting it in cmd.Start
+// scanner reads the command output stream
+func (s *Service) commandStart(id int64) (*bufio.Scanner, *exec.Cmd, error) {
+	val, _ := s.ScriptsCache.Get(id)
+
+	script := val.(string)
+
+	cmd := exec.Command("/bin/sh", "-c", script)
+	_ = s.ExecCmdCache.Set(id, cmd)
+
+	stdout, err := cmd.StdoutPipe()
+
+	if err != nil {
+		return nil, nil, errors.New(fmt.Sprintf("error creating stdout pipe: %s", err))
+	}
+
+	if err = cmd.Start(); err != nil {
+		return nil, nil, errors.New(fmt.Sprintf("error: unsuccessful starting command_id = %d: %s", id, err))
+	}
+
+	scanner := bufio.NewScanner(stdout)
+
+	return scanner, cmd, nil
+}
+
 // ReadCommandOutput Read output and write to chan
-func (s *Service) ReadCommandOutput(scanner *bufio.Scanner, outputScriptCh chan string) {
+func (s *Service) readCommandOutput(scanner *bufio.Scanner, outputScriptCh chan string) {
 	defer close(outputScriptCh)
+
 	for scanner.Scan() {
 		outputScriptCh <- scanner.Text()
 	}
 }
 
 // WriteCommandOutput Write output to DB && console from channel
-func (s *Service) WriteCommandOutput(ctx context.Context, id int64, outputCh chan string, consoleMode bool) {
-	for consoleScriptLine := range outputCh {
+func (s *Service) writeCommandOutput(ctx context.Context, id int64, consoleMode bool, outputScriptCh chan string, writeDoneCh chan struct{}) {
+	defer func() {
+		writeDoneCh <- struct{}{}
+	}()
+
+	for consoleScriptLine := range outputScriptCh {
 		if consoleMode {
 			log.Println(consoleScriptLine)
 		}
 		if err := s.Repository.CreateCommandOutput(ctx, id, consoleScriptLine); err != nil {
-			log.Println("Error writing command output to database:", err)
+			log.Println(fmt.Sprintf("error writing command_id = %d output to database: %s", id, err))
 		}
 	}
 }
