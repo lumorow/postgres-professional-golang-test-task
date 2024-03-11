@@ -47,6 +47,13 @@ func (c *mutexCache) GetAllKeys() ([]int64, error) {
 	return allKeys, nil
 }
 
+func (c *mutexCache) GetLen() (int, error) {
+	c.mx.RLock()
+	defer c.mx.RUnlock()
+
+	return len(c.storage), nil
+}
+
 func (c *mutexCache) Delete(key int64) error {
 	c.mx.Lock()
 	defer c.mx.Unlock()

@@ -22,7 +22,6 @@ func (s *Service) CreateCommand(ctx context.Context, req *entity.CreateCommandRe
 		Script:      r.Script,
 		Description: req.Description,
 	}
-	// Добавить к кеш значение
-	// map[id] = entity.Command{}
+
 	return res, nil
 }

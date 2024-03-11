@@ -11,22 +11,22 @@ import (
 func InitRouter(commandHandler *command.Handler) *gin.Engine {
 	r := gin.New()
 
-	//	Создание команды
+	//	Create command
 	r.POST("/command", commandHandler.CreateCommand)
 
-	//	Запуск команды
+	//	Start command
 	r.GET("/command/:id", commandHandler.GetCommandById)
 
-	//	Запуск нескольких команд
+	//	Start some commans
 	r.GET("/commands", commandHandler.GetCommands)
 
-	//	Получение списка всех команд
+	//	Get list command (without start)
 	r.GET("/all-commands", commandHandler.GetAllCommands)
 
-	//	Удаление команды
+	//	Delete command
 	r.DELETE("/command/:id", commandHandler.DeleteCommandById)
 
-	//	Остановка команды
+	//	Stop command
 	r.POST("/command/:id", commandHandler.StopCommandById)
 
 	// Swagger

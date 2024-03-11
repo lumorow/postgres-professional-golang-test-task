@@ -21,54 +21,61 @@ func (s *Service) Runner() {
 	defer close(ch)
 	wg := sync.WaitGroup{}
 	ctx := context.Background()
-	for {
-		scriptIds, _ := s.ScriptsCache.GetAllKeys()
-		wg.Add(len(scriptIds))
+	select {
+	case <-s.StopSignal:
+		return
+	default:
+		for {
+			if l, err := s.ScriptsCache.GetLen(); l > 0 && err == nil {
+				scriptIds, _ := s.ScriptsCache.GetAllKeys()
+				wg.Add(len(scriptIds))
 
-		ConsoleMode := OFF
-		if len(scriptIds) == 1 {
-			ConsoleMode = ON
+				ConsoleMode := OFF
+				if len(scriptIds) == 1 {
+					ConsoleMode = ON
+				}
+
+				for _, id := range scriptIds {
+					ch <- struct{}{}
+					go func(id int64) {
+						defer func() {
+							_ = s.ScriptsCache.Delete(id)
+							_ = s.ExecCmdCache.Delete(id)
+							wg.Done()
+							<-ch
+						}()
+
+						scanner, cmd, err := s.commandStart(id)
+						if err != nil {
+							log.Println(err)
+							return
+						}
+
+						outputScriptCh := make(chan string, 5)
+						writeDoneCh := make(chan struct{})
+
+						defer close(writeDoneCh)
+
+						go s.readCommandOutput(scanner, outputScriptCh)
+
+						go s.writeCommandOutput(ctx, id, ConsoleMode, outputScriptCh, writeDoneCh)
+
+						if err := scanner.Err(); err != nil {
+							log.Println(fmt.Sprintf("error: scanning command_id = %d output: %s", id, err))
+						}
+
+						err = cmd.Wait()
+						<-writeDoneCh
+						if err != nil {
+							log.Println(fmt.Sprintf("error: command id = %d %s", id, err))
+						} else {
+							log.Println(fmt.Sprintf("command_id = %d executed successfully!", id))
+						}
+					}(id)
+				}
+				wg.Wait()
+			}
 		}
-
-		for _, id := range scriptIds {
-			ch <- struct{}{}
-			go func(id int64) {
-				defer func() {
-					_ = s.ScriptsCache.Delete(id)
-					_ = s.ExecCmdCache.Delete(id)
-					wg.Done()
-					<-ch
-				}()
-
-				scanner, cmd, err := s.commandStart(id)
-				if err != nil {
-					log.Println(err)
-					return
-				}
-
-				outputScriptCh := make(chan string, 5)
-				writeDoneCh := make(chan struct{})
-
-				defer close(writeDoneCh)
-
-				go s.readCommandOutput(scanner, outputScriptCh)
-
-				go s.writeCommandOutput(ctx, id, ConsoleMode, outputScriptCh, writeDoneCh)
-
-				if err := scanner.Err(); err != nil {
-					log.Println(fmt.Sprintf("error: scanning command_id = %d output: %s", id, err))
-				}
-
-				err = cmd.Wait()
-				<-writeDoneCh
-				if err != nil {
-					log.Println(fmt.Sprintf("error: command id = %d %s", id, err))
-				} else {
-					log.Println(fmt.Sprintf("command_id = %d executed successfully!", id))
-				}
-			}(id)
-		}
-		wg.Wait()
 	}
 }
 

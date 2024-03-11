@@ -22,19 +22,25 @@ type Cache interface {
 	Get(key int64) (any, error)
 	GetAllKeys() ([]int64, error)
 	Delete(key int64) error
+	GetLen() (int, error)
 }
 
 type Service struct {
 	Repository
 	ScriptsCache Cache
 	ExecCmdCache Cache
+	StopSignal   chan struct{}
 }
 
+// NewService
+// StopSignal needed for kill s.Runner for testing
 func NewService(repository Repository, scriptsCache, execCmdCache Cache) *Service {
+	StopSignal := make(chan struct{})
 	s := &Service{
 		repository,
 		scriptsCache,
 		execCmdCache,
+		StopSignal,
 	}
 
 	go s.Runner()

@@ -190,6 +190,21 @@ func (mr *MockCacheMockRecorder) GetAllKeys() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllKeys", reflect.TypeOf((*MockCache)(nil).GetAllKeys))
 }
 
+// GetLen mocks base method.
+func (m *MockCache) GetLen() (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLen")
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLen indicates an expected call of GetLen.
+func (mr *MockCacheMockRecorder) GetLen() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLen", reflect.TypeOf((*MockCache)(nil).GetLen))
+}
+
 // Set mocks base method.
 func (m *MockCache) Set(key int64, value any) error {
 	m.ctrl.T.Helper()

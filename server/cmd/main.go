@@ -42,6 +42,7 @@ func main() {
 	scriptsCache := command_cache.NewCache()
 	execCmdCache := command_cache.NewCache()
 	commandSvc := command_service.NewService(commandRep, scriptsCache, execCmdCache)
+	defer func() { commandSvc.StopSignal <- struct{}{} }()
 	CommandHandler := command.NewHandler(commandSvc)
 
 	r := router.InitRouter(CommandHandler)
