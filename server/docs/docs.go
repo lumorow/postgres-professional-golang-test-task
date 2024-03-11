@@ -16,6 +16,31 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/all-commands": {
+            "get": {
+                "description": "get all commands from database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "all-commands"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/command": {
             "post": {
                 "description": "Add new command to DB",
@@ -26,12 +51,12 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Segment"
+                    "command"
                 ],
                 "parameters": [
                     {
                         "description": "Script and description for script",
-                        "name": "segment",
+                        "name": "command",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -48,6 +73,148 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/command/{id}": {
+            "get": {
+                "description": "get and start command by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "command"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Command ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "stop execution command by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "command"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Command ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "get command id in path",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "command"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Command ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/commands": {
+            "get": {
+                "description": "get and start some command by ids",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "commands"
+                ],
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Command IDs",
+                        "name": "ids",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "string"
                         }

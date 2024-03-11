@@ -10,13 +10,13 @@ import (
 
 // CreateCommand @Summary Create command
 // @Description Add new command to DB
-// @Tags Segment
+// @Tags command
 // @Accept json
 // @Produce json
-// @Param segment body entity.CreateCommandReq true "Script and description for script"
+// @Param command body entity.CreateCommandReq true "Script and description for script"
 // @Success 200 {object} entity.CreateCommandRes
 // @Failure 400 {object} string
-// @Failure 400 {object} string
+// @Failure 500 {object} string
 // @Router /command [post]
 func (h *Handler) CreateCommand(c *gin.Context) {
 	var cd entity.CreateCommandReq
@@ -27,6 +27,7 @@ func (h *Handler) CreateCommand(c *gin.Context) {
 
 	if err := h.validateReqCommand(cd); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	res, err := h.Service.CreateCommand(c.Request.Context(), &cd)

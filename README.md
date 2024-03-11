@@ -18,7 +18,6 @@
 
 ### 2. Запуск
 - Склонировать репозиторий
-- ```go mod tidy```: Установить зависимости
 - ```make postgresinit```: Postgres Docker
 - ```make migrationup```: Migrate table
 - ```make server```: Server

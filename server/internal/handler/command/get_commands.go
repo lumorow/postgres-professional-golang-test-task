@@ -5,6 +5,14 @@ import (
 	"net/http"
 )
 
+// GetCommands @Summary Start some commands
+// @Description get and start some command by ids
+// @Tags commands
+// @Produce json
+// @Param    ids   query	[]int  true  "Command IDs"
+// @Success 200 {object} string
+// @Failure 500 {object} string
+// @Router /commands [get]
 func (h *Handler) GetCommands(c *gin.Context) {
 	ids := c.QueryArray("id")
 

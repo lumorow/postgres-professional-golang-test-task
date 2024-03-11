@@ -5,6 +5,13 @@ import (
 	"net/http"
 )
 
+// GetAllCommands @Summary Get all commands
+// @Description get all commands from database
+// @Tags all-commands
+// @Produce json
+// @Success 200 {object} string
+// @Failure 500 {object} string
+// @Router /all-commands [get]
 func (h *Handler) GetAllCommands(c *gin.Context) {
 	res, err := h.Service.GetAllCommands(c.Request.Context())
 	if err != nil {

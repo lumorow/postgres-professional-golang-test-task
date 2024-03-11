@@ -22,6 +22,22 @@ info:
   title: Launch-command
   version: "1.0"
 paths:
+  /all-commands:
+    get:
+      description: get all commands from database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      tags:
+      - all-commands
   /command:
     post:
       consumes:
@@ -30,7 +46,7 @@ paths:
       parameters:
       - description: Script and description for script
         in: body
-        name: segment
+        name: command
         required: true
         schema:
           $ref: '#/definitions/entity.CreateCommandReq'
@@ -45,6 +61,99 @@ paths:
           description: Bad Request
           schema:
             type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
       tags:
-      - Segment
+      - command
+  /command/{id}:
+    delete:
+      description: get command id in path
+      parameters:
+      - description: Command ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      tags:
+      - command
+    get:
+      description: get and start command by id
+      parameters:
+      - description: Command ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      tags:
+      - command
+    post:
+      description: stop execution command by id
+      parameters:
+      - description: Command ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      tags:
+      - command
+  /commands:
+    get:
+      description: get and start some command by ids
+      parameters:
+      - collectionFormat: csv
+        description: Command IDs
+        in: query
+        items:
+          type: integer
+        name: ids
+        required: true
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      tags:
+      - commands
 swagger: "2.0"

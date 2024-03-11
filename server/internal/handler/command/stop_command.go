@@ -5,6 +5,14 @@ import (
 	"net/http"
 )
 
+// StopCommandById @Summary Stop command
+// @Description stop execution command by id
+// @Tags command
+// @Produce json
+// @Param    id   path	int  true  "Command ID"
+// @Success 200 {object} string
+// @Failure 500 {object} string
+// @Router /command/{id} [post]
 func (h *Handler) StopCommandById(c *gin.Context) {
 	id := c.Param("id")
 
