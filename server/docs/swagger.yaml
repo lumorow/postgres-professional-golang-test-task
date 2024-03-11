@@ -1,0 +1,50 @@
+basePath: /
+definitions:
+  entity.CreateCommandReq:
+    properties:
+      description:
+        type: string
+      script:
+        type: string
+    type: object
+  entity.CreateCommandRes:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      script:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  title: Launch-command
+  version: "1.0"
+paths:
+  /command:
+    post:
+      consumes:
+      - application/json
+      description: Add new command to DB
+      parameters:
+      - description: Script and description for script
+        in: body
+        name: segment
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CreateCommandReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CreateCommandRes'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      tags:
+      - Segment
+swagger: "2.0"

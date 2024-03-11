@@ -12,13 +12,18 @@
 Установка для Windows:
 - ```scoop install migrate```
 
+*optionally*:
 - ```go install github.com/golang/mock/mockgen@v1.6.0```
+
 
 ### 2. Запуск
 - Склонировать репозиторий
 - ```go mod tidy```: Установить зависимости
 - ```make postgresinit```: Postgres Docker
-- ```make migrationup```: Migrate
+- ```make migrationup```: Migrate table
 - ```make server```: Server
 
-## Описание
+## 3. Схема работы
+
+## 4. Дополнительный функционал
+- Добавил Swagger для наглядного и удобного тестирование API: http://localhost:8000/swagger/index.html

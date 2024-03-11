@@ -8,6 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// CreateCommand @Summary Create command
+// @Description Add new command to DB
+// @Tags Segment
+// @Accept json
+// @Produce json
+// @Param segment body entity.CreateCommandReq true "Script and description for script"
+// @Success 200 {object} entity.CreateCommandRes
+// @Failure 400 {object} string
+// @Failure 400 {object} string
+// @Router /command [post]
 func (h *Handler) CreateCommand(c *gin.Context) {
 	var cd entity.CreateCommandReq
 	if err := c.ShouldBindJSON(&cd); err != nil {

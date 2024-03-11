@@ -22,7 +22,6 @@ type Config struct {
 func NewDatabase(cfg Config) (*database, error) {
 	db, err := sqlx.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
 		cfg.Host, cfg.Port, cfg.Username, cfg.DBName, cfg.Password, cfg.SSLMode))
-	//db, err := sql.Open("postgres", "postgresql://postgres:password@localhost:5432/chat?sslmode=disable")
 	if err != nil {
 		return nil, err
 	}

@@ -13,7 +13,8 @@ migrationdown:
 server:
 	go run server/cmd/main.go
 
-client:
-	go run client/cmd/main.go
+go_swagger:
+	cd server && swag init --generalInfo  server/cmd/main.go -o server/docs
 
-.PHONY: postgresinit dropdb migrationup migrationdown server client
+
+.PHONY: postgresinit dropdb migrationup migrationdown server

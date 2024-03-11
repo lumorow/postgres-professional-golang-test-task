@@ -13,6 +13,13 @@ import (
 	"github.com/spf13/viper"
 )
 
+// @title Launch-command
+// @version 1.0
+// description API Server for Launch-command
+
+// @host localhost:8000
+// @BasePath /
+
 func main() {
 	if err := initConfig(); err != nil {
 		log.Fatalf("error initializing configs: %s", err.Error())
