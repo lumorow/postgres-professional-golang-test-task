@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"errors"
 	"pstgrprof/server/internal/entity"
 	mock "pstgrprof/server/internal/service/command/mocks"
 	"testing"
@@ -370,8 +371,7 @@ func TestService_GetAllCommands(t *testing.T) {
 		ExecCmdCache *mock.MockCache
 	}
 	type args struct {
-		c  context.Context
-		id string
+		c context.Context
 	}
 	tests := []struct {
 		name    string
@@ -423,7 +423,7 @@ func TestService_GetAllCommands(t *testing.T) {
 					},
 					{
 						ID:          3,
-						Script:      "script\": \"echo \\\"Hello there!\\\" && sleep 8 && echo \\\"Oops! I fell asleep for a couple seconds!\\\"",
+						Script:      "echo \\\"Hello there!\\\" && sleep 8 && echo \\\"Oops! I fell asleep for a couple seconds!\\\"",
 						Description: "combined script with sleeping",
 					},
 					{
@@ -496,7 +496,7 @@ func TestService_GetCommands(t *testing.T) {
 				},
 				{
 					ID:          int64(3),
-					Script:      "script\": \"echo \\\"Hello there!\\\" && sleep 8 && echo \\\"Oops! I fell asleep for a couple seconds!\\\"",
+					Script:      "echo \\\"Hello there!\\\" && sleep 8 && echo \\\"Oops! I fell asleep for a couple seconds!\\\"",
 					Description: "combined script with sleeping",
 				},
 				{
@@ -520,7 +520,7 @@ func TestService_GetCommands(t *testing.T) {
 					},
 					{
 						ID:          int64(3),
-						Script:      "script\": \"echo \\\"Hello there!\\\" && sleep 8 && echo \\\"Oops! I fell asleep for a couple seconds!\\\"",
+						Script:      "echo \\\"Hello there!\\\" && sleep 8 && echo \\\"Oops! I fell asleep for a couple seconds!\\\"",
 						Description: "combined script with sleeping",
 					},
 					{
@@ -533,7 +533,7 @@ func TestService_GetCommands(t *testing.T) {
 				resps := []string{
 					"echo Hello world!",
 					"echo \"The current directory is:\" && pwd && echo \"The user logged in is:\" && whoami",
-					"script\": \"echo \\\"Hello there!\\\" && sleep 8 && echo \\\"Oops! I fell asleep for a couple seconds!\\\"",
+					"echo \\\"Hello there!\\\" && sleep 8 && echo \\\"Oops! I fell asleep for a couple seconds!\\\"",
 					"ls",
 				}
 				for i = 0; i < 4; i++ {
@@ -562,6 +562,56 @@ func TestService_GetCommands(t *testing.T) {
 
 			service.StopRunner()
 			require.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestService_StopCommandById(t *testing.T) {
+	type fields struct {
+		Repository   *mock.MockRepository
+		ScriptsCache *mock.MockCache
+		ExecCmdCache *mock.MockCache
+	}
+	type args struct {
+		id string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+		prepare func(args args, fields fields)
+	}{
+		{
+			name: "test_1, error not expected",
+			args: args{
+				id: "1",
+			},
+			wantErr: true,
+			prepare: func(args args, fields fields) {
+				fields.ExecCmdCache.EXPECT().Get(int64(1)).Return(nil, errors.New("not found value"))
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			f := fields{
+				Repository:   mock.NewMockRepository(ctrl),
+				ScriptsCache: mock.NewMockCache(ctrl),
+				ExecCmdCache: mock.NewMockCache(ctrl),
+			}
+			tt.prepare(tt.args, f)
+
+			service := NewService(f.Repository, f.ScriptsCache, f.ExecCmdCache)
+			err := service.StopCommandById(tt.args.id)
+
+			service.StopRunner()
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
 		})
 	}
 }

@@ -41,7 +41,7 @@ func (c *mutexCache) GetAllKeys() ([]int64, error) {
 	c.mx.RLock()
 	defer c.mx.RUnlock()
 	allKeys := make([]int64, 0, len(c.storage))
-	for key, _ := range c.storage {
+	for key := range c.storage {
 		allKeys = append(allKeys, key)
 	}
 	return allKeys, nil

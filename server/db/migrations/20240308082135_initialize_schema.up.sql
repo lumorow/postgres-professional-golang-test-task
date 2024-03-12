@@ -1,10 +1,10 @@
-CREATE TABLE "commands" (
+CREATE TABLE IF NOT EXISTS "commands" (
     "id" serial PRIMARY KEY,
     "script" varchar NOT NULL,
     "description" varchar NOT NULL
 );
 
-CREATE TABLE "commands_output" (
+CREATE TABLE IF NOT EXISTS "commands_output" (
     "id" serial PRIMARY KEY,
     "id_command" int NOT NULL,
     "output" varchar,

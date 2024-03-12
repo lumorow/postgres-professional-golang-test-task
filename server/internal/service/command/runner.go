@@ -3,7 +3,6 @@ package command
 import (
 	"bufio"
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"os/exec"
@@ -61,15 +60,15 @@ func (s *Service) Runner() {
 						go s.writeCommandOutput(ctx, id, ConsoleMode, outputScriptCh, writeDoneCh)
 
 						if err := scanner.Err(); err != nil {
-							log.Println(fmt.Sprintf("error: scanning command_id = %d output: %s", id, err))
+							log.Printf("error: scanning command_id = %d output: %s", id, err)
 						}
 
 						err = cmd.Wait()
 						<-writeDoneCh
 						if err != nil {
-							log.Println(fmt.Sprintf("error: command id = %d %s", id, err))
+							log.Printf("error: command id = %d %s", id, err)
 						} else {
-							log.Println(fmt.Sprintf("command_id = %d executed successfully!", id))
+							log.Printf("command_id = %d executed successfully!", id)
 						}
 					}(id)
 				}
@@ -92,11 +91,11 @@ func (s *Service) commandStart(id int64) (*bufio.Scanner, *exec.Cmd, error) {
 	stdout, err := cmd.StdoutPipe()
 
 	if err != nil {
-		return nil, nil, errors.New(fmt.Sprintf("error creating stdout pipe: %s", err))
+		return nil, nil, fmt.Errorf("error creating stdout pipe: %s", err)
 	}
 
 	if err = cmd.Start(); err != nil {
-		return nil, nil, errors.New(fmt.Sprintf("error: unsuccessful starting command_id = %d: %s", id, err))
+		return nil, nil, fmt.Errorf("error: unsuccessful starting command_id = %d: %s", id, err)
 	}
 
 	scanner := bufio.NewScanner(stdout)
@@ -124,7 +123,7 @@ func (s *Service) writeCommandOutput(ctx context.Context, id int64, consoleMode 
 			log.Println(consoleScriptLine)
 		}
 		if err := s.Repository.CreateCommandOutput(ctx, id, consoleScriptLine); err != nil {
-			log.Println(fmt.Sprintf("error writing command_id = %d output to database: %s", id, err))
+			log.Printf("error writing command_id = %d output to database: %s", id, err)
 		}
 	}
 }

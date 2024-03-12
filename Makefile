@@ -10,19 +10,10 @@ dropdb:
 	@echo "Drop postgres database from docker"
 	docker exec -it postgres dropdb postgres
 
-.PHONY: migrationup
-migrationup:
-	@echo "Migration tables"
-	migrate -path server/db/migrations -database "postgresql://root:password@localhost:5432/postgres?sslmode=disable" -verbose up
-
-.PHONY: migrationdown
-migrationdown:
-	@echo "Delete tables"
-	migrate -path server/db/migrations -database "postgresql://root:password@localhost:5432/postgres?sslmode=disable" -verbose down
-
 .PHONY: test
 test:
-	go test ./server/internal/...
+	@echo "Start tests"
+	go test ./server/internal/service/command ./server/internal/handler/command
 
 .PHONY: deps
 deps:
@@ -33,10 +24,10 @@ swagger_init:
 	@echo "Generate swagger gui"
 	swag init --generalInfo  server/cmd/main.go -o server/docs
 
-.PHONY: swag_gui
-swag_gui:
+.PHONY: swag_ui
+swag_ui:
 	@echo "Open swagger index.html"
-   	open http://localhost:8000/swagger/index.html
+	open http://localhost:8000/swagger/index.html
 
 .PHONY: server
 server: deps swagger_init

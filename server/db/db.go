@@ -2,6 +2,9 @@ package db
 
 import (
 	"fmt"
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
@@ -42,4 +45,19 @@ func (d *database) Close() {
 
 func (d *database) GetDB() *sqlx.DB {
 	return d.db
+}
+
+func (d *database) Migrate() error {
+	driver, err := postgres.WithInstance(d.db.DB, &postgres.Config{})
+	if err != nil {
+		return err
+	}
+
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://server/db/migrations",
+		"postgres", driver)
+	if err != nil {
+		return err
+	}
+	return m.Up()
 }
