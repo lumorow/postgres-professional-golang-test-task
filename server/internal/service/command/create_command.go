@@ -20,7 +20,7 @@ func (s *Service) CreateCommand(ctx context.Context, req *entity.CreateCommandRe
 	res := &entity.CreateCommandRes{
 		ID:          strconv.Itoa(int(r.ID)),
 		Script:      r.Script,
-		Description: req.Description,
+		Description: r.Description,
 	}
 
 	return res, nil

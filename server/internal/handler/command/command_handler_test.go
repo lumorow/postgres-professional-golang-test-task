@@ -123,10 +123,7 @@ func TestHandler_DeleteCommandById(t *testing.T) {
 			prepare: func(fields fields, recorder *httptest.ResponseRecorder, c *gin.Context) {
 				route := "/command/{id}"
 				c.Request = httptest.NewRequest(http.MethodDelete, route, nil)
-				c.Params = []gin.Param{{
-					Key:   "id",
-					Value: "1",
-				}}
+				c.AddParam("id", "1")
 				c.Request.Header.Set("Content-Type", "application/json")
 				fields.Service.EXPECT().DeleteCommandById(c.Request.Context(), "1").Return(nil)
 			},
@@ -160,73 +157,211 @@ func TestHandler_DeleteCommandById(t *testing.T) {
 }
 
 func TestHandler_GetAllCommands(t *testing.T) {
+	type want struct {
+		res    string
+		status int
+	}
 	type fields struct {
-		Service Service
+		Service *mock.MockService
 	}
-	type args struct {
-		c *gin.Context
-	}
+
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
+		name    string
+		fields  fields
+		wantErr bool
+		want    want
+		prepare func(fields fields, recorder *httptest.ResponseRecorder, c *gin.Context)
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "test_1, StatusOK",
+			wantErr: false,
+			want: want{
+				res:    "[{\"id\":1,\"script\":\"ls\",\"description\":\"look files\"},{\"id\":2,\"script\":\"ls\",\"description\":\"simple script for look files\"}]",
+				status: http.StatusOK,
+			},
+			prepare: func(fields fields, recorder *httptest.ResponseRecorder, c *gin.Context) {
+				route := "/all-commands"
+				c.Request = httptest.NewRequest(http.MethodGet, route, nil)
+				c.Request.Header.Set("Content-Type", "application/json")
+				fields.Service.EXPECT().GetAllCommands(c.Request.Context()).Return(&[]entity.Command{
+					{
+						ID:          1,
+						Script:      "ls",
+						Description: "look files",
+					},
+					{
+						ID:          2,
+						Script:      "ls",
+						Description: "simple script for look files",
+					},
+				}, nil)
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &Handler{
-				Service: tt.fields.Service,
+			ctrl := gomock.NewController(t)
+			f := fields{
+				Service: mock.NewMockService(ctrl),
 			}
-			h.GetAllCommands(tt.args.c)
+			handler := NewHandler(f.Service)
+
+			w := httptest.NewRecorder()
+			c := GetTestGinContext(w)
+			tt.prepare(f, w, c)
+			handler.GetAllCommands(c)
+
+			resp := w.Result()
+
+			body, err := ioutil.ReadAll(resp.Body)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.Equal(t, tt.want.status, resp.StatusCode)
+			require.Equal(t, tt.want.res, string(body))
+
 		})
 	}
 }
 
 func TestHandler_GetCommandById(t *testing.T) {
+	type want struct {
+		res    string
+		status int
+	}
 	type fields struct {
-		Service Service
+		Service *mock.MockService
 	}
-	type args struct {
-		c *gin.Context
-	}
+
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
+		name    string
+		fields  fields
+		wantErr bool
+		want    want
+		prepare func(fields fields, recorder *httptest.ResponseRecorder, c *gin.Context)
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "test_1, StatusOK",
+			wantErr: false,
+			want: want{
+				res:    "{\"id\":1,\"script\":\"ls\",\"description\":\"look files\"}",
+				status: http.StatusOK,
+			},
+			prepare: func(fields fields, recorder *httptest.ResponseRecorder, c *gin.Context) {
+				route := "/command/{id}"
+				value := "1"
+				c.Request = httptest.NewRequest(http.MethodGet, route, nil)
+				c.Params = []gin.Param{{
+					Key:   "id",
+					Value: value,
+				}}
+				c.Request.Header.Set("Content-Type", "application/json")
+				fields.Service.EXPECT().GetCommandById(c.Request.Context(), value).Return(&entity.Command{
+					ID:          1,
+					Script:      "ls",
+					Description: "look files",
+				}, nil)
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &Handler{
-				Service: tt.fields.Service,
+			ctrl := gomock.NewController(t)
+			f := fields{
+				Service: mock.NewMockService(ctrl),
 			}
-			h.GetCommandById(tt.args.c)
+			handler := NewHandler(f.Service)
+
+			w := httptest.NewRecorder()
+			c := GetTestGinContext(w)
+			tt.prepare(f, w, c)
+			handler.GetCommandById(c)
+
+			resp := w.Result()
+
+			body, err := ioutil.ReadAll(resp.Body)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.Equal(t, tt.want.status, resp.StatusCode)
+			require.Equal(t, tt.want.res, string(body))
+
 		})
 	}
 }
 
 func TestHandler_GetCommands(t *testing.T) {
+	type want struct {
+		res    string
+		status int
+	}
 	type fields struct {
-		Service Service
+		Service *mock.MockService
 	}
-	type args struct {
-		c *gin.Context
-	}
+
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
+		name    string
+		fields  fields
+		wantErr bool
+		want    want
+		prepare func(fields fields, recorder *httptest.ResponseRecorder, c *gin.Context)
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "test_1, StatusOK",
+			wantErr: false,
+			want: want{
+				res:    "[{\"id\":1,\"script\":\"ls\",\"description\":\"look files\"},{\"id\":2,\"script\":\"ls\",\"description\":\"simple script for look files\"}]",
+				status: http.StatusOK,
+			},
+			prepare: func(fields fields, recorder *httptest.ResponseRecorder, c *gin.Context) {
+				route := "/commands"
+				//c.Keys["id"] = []string{"1", "2"}
+				//c.AddParam("id", "1")
+				//c.AddParam("id", "2")
+
+				c.Request = httptest.NewRequest(http.MethodGet, route+"?id=1&id=2", nil)
+				c.Request.Header.Set("Content-Type", "application/json")
+				fields.Service.EXPECT().GetCommands(c.Request.Context(), []string{"1", "2"}).Return(&[]entity.Command{
+					{
+						ID:          1,
+						Script:      "ls",
+						Description: "look files",
+					},
+					{
+						ID:          2,
+						Script:      "ls",
+						Description: "simple script for look files",
+					},
+				}, nil)
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &Handler{
-				Service: tt.fields.Service,
+			ctrl := gomock.NewController(t)
+			f := fields{
+				Service: mock.NewMockService(ctrl),
 			}
-			h.GetCommands(tt.args.c)
+			handler := NewHandler(f.Service)
+
+			w := httptest.NewRecorder()
+			c := GetTestGinContext(w)
+
+			tt.prepare(f, w, c)
+			handler.GetCommands(c)
+
+			resp := w.Result()
+
+			body, err := ioutil.ReadAll(resp.Body)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.Equal(t, tt.want.status, resp.StatusCode)
+			require.Equal(t, tt.want.res, string(body))
+
 		})
 	}
 }

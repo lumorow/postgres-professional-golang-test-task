@@ -388,7 +388,7 @@ func TestService_GetAllCommands(t *testing.T) {
 			},
 			want: &[]entity.Command{
 				{
-					ID:          int64(1),
+					ID:          1,
 					Script:      "echo Hello world!",
 					Description: "simple script",
 				},
@@ -412,7 +412,7 @@ func TestService_GetAllCommands(t *testing.T) {
 				fields.Repository.EXPECT().GetAllCommands(
 					context.Background()).Return(&[]entity.Command{
 					{
-						ID:          int64(1),
+						ID:          1,
 						Script:      "echo Hello world!",
 						Description: "simple script",
 					},

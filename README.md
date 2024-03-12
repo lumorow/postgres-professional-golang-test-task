@@ -47,8 +47,8 @@
 
 ```json
 {
-"script": "echo \"The current directory is:\" && pwd && echo \"The user logged in is:\" && whoami",
-"description": "query scripts"
+  "script": "echo \"The current directory is:\" && pwd && echo \"The user logged in is:\" && whoami",
+  "description": "query scripts"
 }
 ```
 
