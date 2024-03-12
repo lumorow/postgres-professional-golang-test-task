@@ -399,7 +399,7 @@ func TestService_GetAllCommands(t *testing.T) {
 				},
 				{
 					ID:          3,
-					Script:      "script\": \"echo \\\"Hello there!\\\" && sleep 8 && echo \\\"Oops! I fell asleep for a couple seconds!\\\"",
+					Script:      "echo \\\"Hello there!\\\" && sleep 8 && echo \\\"Oops! I fell asleep for a couple seconds!\\\"",
 					Description: "combined script with sleeping",
 				},
 				{

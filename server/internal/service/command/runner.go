@@ -10,14 +10,16 @@ import (
 )
 
 const (
-	ON  = true
-	OFF = false
+	ON                = true
+	OFF               = false
+	MaxCommandProcess = 10
 )
 
 // Runner Check a new scripts for start
+// MaxCommandProcess - const for set maximum launch command
 func (s *Service) Runner() {
-	ch := make(chan struct{}, 10)
-	defer close(ch)
+	сommandLimit := make(chan struct{}, MaxCommandProcess)
+	defer close(сommandLimit)
 	wg := sync.WaitGroup{}
 	ctx := context.Background()
 	select {
@@ -29,52 +31,56 @@ func (s *Service) Runner() {
 				scriptIds, _ := s.ScriptsCache.GetAllKeys()
 				wg.Add(len(scriptIds))
 
-				ConsoleMode := OFF
+				consoleMode := OFF
 				if len(scriptIds) == 1 {
-					ConsoleMode = ON
+					consoleMode = ON
 				}
 
 				for _, id := range scriptIds {
-					ch <- struct{}{}
+					сommandLimit <- struct{}{}
 					go func(id int64) {
-						defer func() {
-							_ = s.ScriptsCache.Delete(id)
-							_ = s.ExecCmdCache.Delete(id)
-							wg.Done()
-							<-ch
-						}()
-
-						scanner, cmd, err := s.commandStart(id)
-						if err != nil {
-							log.Println(err)
-							return
-						}
-
-						outputScriptCh := make(chan string, 5)
-						writeDoneCh := make(chan struct{})
-
-						defer close(writeDoneCh)
-
-						go s.readCommandOutput(scanner, outputScriptCh)
-
-						go s.writeCommandOutput(ctx, id, ConsoleMode, outputScriptCh, writeDoneCh)
-
-						if err := scanner.Err(); err != nil {
-							log.Printf("error: scanning command_id = %d output: %s", id, err)
-						}
-
-						err = cmd.Wait()
-						<-writeDoneCh
-						if err != nil {
-							log.Printf("error: command id = %d %s", id, err)
-						} else {
-							log.Printf("command_id = %d executed successfully!", id)
-						}
+						s.executeCommand(ctx, id, consoleMode, &wg, сommandLimit)
 					}(id)
 				}
 				wg.Wait()
 			}
 		}
+	}
+}
+
+// executeCommand stating execution command
+func (s *Service) executeCommand(ctx context.Context, id int64, consoleMode bool, wg *sync.WaitGroup, ch chan struct{}) {
+	defer func() {
+		_ = s.ScriptsCache.Delete(id)
+		_ = s.ExecCmdCache.Delete(id)
+		wg.Done()
+		<-ch
+	}()
+
+	scanner, cmd, err := s.commandStart(id)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	outputScriptCh := make(chan string, 100)
+	writeDoneCh := make(chan struct{})
+
+	defer close(writeDoneCh)
+
+	go s.readCommandOutput(scanner, outputScriptCh)
+	go s.writeCommandOutput(ctx, id, consoleMode, outputScriptCh, writeDoneCh)
+
+	if err := scanner.Err(); err != nil {
+		log.Printf("error: scanning command_id = %d output: %s", id, err)
+	}
+
+	err = cmd.Wait()
+	<-writeDoneCh
+	if err != nil {
+		log.Printf("error: command id = %d %s", id, err)
+	} else {
+		log.Printf("command_id = %d executed successfully!", id)
 	}
 }
 

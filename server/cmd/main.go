@@ -45,7 +45,7 @@ func main() {
 	if err = dbConn.Migrate(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		log.Fatalf("could not run migration: %s", err.Error())
 	}
-
+	
 	commandRep := command_repo.NewRepository(dbConn.GetDB())
 	scriptsCache := command_cache.NewCache()
 	execCmdCache := command_cache.NewCache()
