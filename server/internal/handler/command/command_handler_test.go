@@ -1,6 +1,7 @@
 package command
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
@@ -65,6 +66,17 @@ func TestHandler_CreateCommand(t *testing.T) {
 			},
 			prepare: func(fields fields, recorder *httptest.ResponseRecorder, c *gin.Context) {
 				c.Request = httptest.NewRequest(http.MethodPost, "/command", strings.NewReader(`{"script": "", "description": "look files"}`))
+				c.Request.Header.Set("Content-Type", "application/json")
+			},
+		}, {
+			name:    "test_3, StatusBadRequest",
+			wantErr: false,
+			want: want{
+				res:    "{\"error\":\"description for script must not be empty\"}",
+				status: http.StatusBadRequest,
+			},
+			prepare: func(fields fields, recorder *httptest.ResponseRecorder, c *gin.Context) {
+				c.Request = httptest.NewRequest(http.MethodPost, "/command", strings.NewReader(`{"script": "ls", "description": ""}`))
 				c.Request.Header.Set("Content-Type", "application/json")
 			},
 		},
@@ -316,12 +328,8 @@ func TestHandler_GetCommands(t *testing.T) {
 				status: http.StatusOK,
 			},
 			prepare: func(fields fields, recorder *httptest.ResponseRecorder, c *gin.Context) {
-				route := "/commands"
-				//c.Keys["id"] = []string{"1", "2"}
-				//c.AddParam("id", "1")
-				//c.AddParam("id", "2")
-
-				c.Request = httptest.NewRequest(http.MethodGet, route+"?id=1&id=2", nil)
+				route := "/commands?id=1&id=2"
+				c.Request = httptest.NewRequest(http.MethodGet, route, nil)
 				c.Request.Header.Set("Content-Type", "application/json")
 				fields.Service.EXPECT().GetCommands(c.Request.Context(), []string{"1", "2"}).Return(&[]entity.Command{
 					{
@@ -335,6 +343,7 @@ func TestHandler_GetCommands(t *testing.T) {
 						Description: "simple script for look files",
 					},
 				}, nil)
+
 			},
 		},
 	}
@@ -367,52 +376,74 @@ func TestHandler_GetCommands(t *testing.T) {
 }
 
 func TestHandler_StopCommandById(t *testing.T) {
+	type want struct {
+		res    string
+		status int
+	}
 	type fields struct {
-		Service Service
+		Service *mock.MockService
 	}
-	type args struct {
-		c *gin.Context
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			h := &Handler{
-				Service: tt.fields.Service,
-			}
-			h.StopCommandById(tt.args.c)
-		})
-	}
-}
 
-func TestHandler_validateReqCommand(t *testing.T) {
-	type fields struct {
-		Service Service
-	}
-	type args struct {
-		req entity.CreateCommandReq
-	}
 	tests := []struct {
 		name    string
 		fields  fields
-		args    args
 		wantErr bool
+		want    want
+		prepare func(fields fields, recorder *httptest.ResponseRecorder, c *gin.Context)
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "test_1, StatusOK",
+			wantErr: false,
+			want: want{
+				res:    "{\"message\":\"command stopped successfully\"}",
+				status: http.StatusOK,
+			},
+			prepare: func(fields fields, recorder *httptest.ResponseRecorder, c *gin.Context) {
+				route := "/command/{id}"
+				c.Request = httptest.NewRequest(http.MethodPost, route, nil)
+				c.AddParam("id", "1")
+				c.Request.Header.Set("Content-Type", "application/json")
+				fields.Service.EXPECT().StopCommandById("1").Return(nil)
+			},
+		}, {
+			name:    "test_2, StatusInternalServerError",
+			wantErr: false,
+			want: want{
+				res:    "{\"error\":\"not found value\"}",
+				status: http.StatusInternalServerError,
+			},
+			prepare: func(fields fields, recorder *httptest.ResponseRecorder, c *gin.Context) {
+				route := "/command/{id}"
+				c.Request = httptest.NewRequest(http.MethodPost, route, nil)
+				c.AddParam("id", "1")
+				c.Request.Header.Set("Content-Type", "application/json")
+				fields.Service.EXPECT().StopCommandById("1").Return(errors.New("not found value"))
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &Handler{
-				Service: tt.fields.Service,
+			ctrl := gomock.NewController(t)
+			f := fields{
+				Service: mock.NewMockService(ctrl),
 			}
-			if err := h.validateReqCommand(tt.args.req); (err != nil) != tt.wantErr {
-				t.Errorf("validateReqCommand() error = %v, wantErr %v", err, tt.wantErr)
+			handler := NewHandler(f.Service)
+
+			w := httptest.NewRecorder()
+			c := GetTestGinContext(w)
+			tt.prepare(f, w, c)
+			handler.StopCommandById(c)
+
+			resp := w.Result()
+
+			body, err := ioutil.ReadAll(resp.Body)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
 			}
+			require.Equal(t, tt.want.status, resp.StatusCode)
+			require.Equal(t, tt.want.res, string(body))
+
 		})
 	}
 }
