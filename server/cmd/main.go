@@ -58,7 +58,7 @@ func main() {
 
 	r := router.InitRouter(CommandHandler)
 
-	log.Printf("Starting Server...")
+	log.Printf("Starting server...")
 
 	if err = router.Start(r, fmt.Sprintf("%s:%s", os.Getenv("SERVER_HOST"), os.Getenv("SERVER_PORT"))); err != nil {
 		log.Fatalf("could not start server: %s", err.Error())

@@ -3,17 +3,17 @@ PATH := $(PATH):$(shell go env GOPATH)/bin
 .PHONY: postgresinit
 postgresinit:
 	@echo "Create and start postgres database in docker"
-	docker run --name postgres -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres
+	docker run --name commands -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -d postgres
 
 .PHONY: dropdb
 dropdb:
 	@echo "Drop postgres database from docker"
-	docker exec -it postgres dropdb postgres
+	docker exec -it postgres dropdb commands
 
 .PHONY: test
 test:
 	@echo "Start tests"
-	go test ./server/internal/service/command ./server/internal/handler/command
+	go clean -testcache &&  go test ./server/internal/service/command ./server/internal/handler/command
 
 .PHONY: deps
 deps:
@@ -37,7 +37,8 @@ server: deps swagger_init
 .PHONY: clean
 clean:
 	rm -rf ./build/scripts-launcher
-
+	docker compose down -v
 .PHONY: build
 build:
+	@echo "Running docker-compose"
 	docker-compose up
