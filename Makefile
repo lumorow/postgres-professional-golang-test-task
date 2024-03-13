@@ -34,6 +34,10 @@ server: deps swagger_init
 	@echo "Running server"
 	go run server/cmd/main.go
 
+.PHONY: clean
+clean:
+	rm -rf ./build/scripts-launcher
+
 .PHONY: build
 build:
 	docker-compose up
